@@ -9,20 +9,21 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
-
-# Copy application source before uv sync so the project layout is available.
 COPY app ./app
 COPY sample_docs ./sample_docs
 
-# Install the exact CPU-only PyTorch build to avoid CUDA dependencies.
-RUN uv venv /opt/venv && \
-    uv pip install \
+RUN uv venv /opt/venv
+
+# Install all locked dependencies except torch. The lockfile's PyPI torch
+# package pulls CUDA dependencies on Linux, which is not needed here.
+RUN uv sync --frozen --no-install-project --no-install-package torch
+
+# Install CPU-only PyTorch after uv sync so uv cannot replace it with the
+# CUDA-enabled build from the lockfile.
+RUN uv pip install \
     --python /opt/venv/bin/python \
     --index-url https://download.pytorch.org/whl/cpu \
     torch==2.14.0
-
-# Install locked dependencies without installing the local project package.
-RUN uv sync --frozen --no-install-project --no-install-package torch
 
 # Build the general FAISS knowledge base.
 RUN uv run --no-sync python -m app.retrieval.ingest
