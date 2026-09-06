@@ -28,7 +28,7 @@ const protect = async (req, res, next) => {
 
         const decoded = jwt.verify(
             token,
-            process.env.jwtSecret
+            env.jwtSecret
         );
 
         let account;
