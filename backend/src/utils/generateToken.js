@@ -7,7 +7,7 @@ const generateToken = (id, role) => {
             id,
             role,
         },
-        process.env.jwtSecret,
+        env.jwtSecret,
         {
             expiresIn: "7d",
         }
