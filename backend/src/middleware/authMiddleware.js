@@ -14,16 +14,36 @@ const protect = async (req, res, next) => {
             });
         }
 
-        const token = authHeader.split(" ")[1];
+        // Safely extract JWT even if there are extra spaces
+        const token = authHeader
+            .replace(/^Bearer\s+/i, "")
+            .trim();
 
-        const decoded = jwt.verify(token, process.env.jwtSecret);
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: "Token is required",
+            });
+        }
+
+        const decoded = jwt.verify(
+            token,
+            process.env.jwtSecret
+        );
 
         let account;
 
         if (decoded.role === "user") {
-            account = await User.findById(decoded.id).select("-password");
+            account = await User.findById(decoded.id)
+                .select("-password");
         } else if (decoded.role === "admin") {
-            account = await Admin.findById(decoded.id).select("-password");
+            account = await Admin.findById(decoded.id)
+                .select("-password");
+        } else {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid account role",
+            });
         }
 
         if (!account) {
@@ -39,6 +59,12 @@ const protect = async (req, res, next) => {
         next();
 
     } catch (error) {
+        console.error(
+            "Auth middleware error:",
+            error.name,
+            error.message
+        );
+
         return res.status(401).json({
             success: false,
             message: "Invalid or expired token",

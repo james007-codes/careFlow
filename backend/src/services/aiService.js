@@ -1,8 +1,10 @@
 const AI_SERVICE_URL = "http://127.0.0.1:8000";
 
-
-export async function sendMessageToAI(message, threadId) {
-
+export async function sendMessageToAI(
+    message,
+    threadId,
+    patientId
+) {
     const response = await fetch(
         `${AI_SERVICE_URL}/api/chat/`,
         {
@@ -14,21 +16,19 @@ export async function sendMessageToAI(message, threadId) {
 
             body: JSON.stringify({
                 message,
-                thread_id: threadId
+                thread_id: threadId,
+                patient_id: patientId
             })
         }
     );
 
-
     if (!response.ok) {
-
         const errorText = await response.text();
 
         throw new Error(
             `AI service error ${response.status}: ${errorText}`
         );
     }
-
 
     return await response.json();
 }

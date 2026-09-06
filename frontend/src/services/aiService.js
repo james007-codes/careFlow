@@ -15,84 +15,7 @@ const getAuthHeaders = () => {
 
 
 /* =========================
-   GET CONVERSATIONS
-========================= */
-
-export const getConversations = async () => {
-    const response = await fetch(
-        `${API_BASE_URL}/conversations`,
-        {
-            method: "GET",
-            headers: getAuthHeaders(),
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.message || "Failed to load conversations"
-        );
-    }
-
-    return data.conversations;
-};
-
-
-/* =========================
-   CREATE CONVERSATION
-========================= */
-
-export const createConversation = async () => {
-    const response = await fetch(
-        `${API_BASE_URL}/conversations`,
-        {
-            method: "POST",
-            headers: getAuthHeaders(),
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.message || "Failed to create conversation"
-        );
-    }
-
-    return data.conversation;
-};
-
-
-/* =========================
-   GET MESSAGES
-========================= */
-
-export const getConversationMessages = async (
-    conversationId
-) => {
-    const response = await fetch(
-        `${API_BASE_URL}/conversations/${conversationId}/messages`,
-        {
-            method: "GET",
-            headers: getAuthHeaders(),
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.message || "Failed to load messages"
-        );
-    }
-
-    return data.messages;
-};
-
-
-/* =========================
-   SEND MESSAGE
+   SEND AI MESSAGE
 ========================= */
 
 export const sendAIMessage = async (
@@ -120,4 +43,42 @@ export const sendAIMessage = async (
     }
 
     return data.response;
+};
+
+
+/* =========================
+   UPLOAD MEDICAL DOCUMENT
+========================= */
+
+export const uploadDocument = async (file) => {
+    const token = localStorage.getItem("token");
+
+    const formData = new FormData();
+
+    formData.append(
+        "document",
+        file
+    );
+
+    const response = await fetch(
+        `${API_BASE_URL}/ai/documents`,
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.message ||
+            "Document upload failed"
+        );
+    }
+
+    return data;
 };

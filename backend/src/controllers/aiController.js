@@ -77,10 +77,11 @@ export async function chatWithAI(req, res) {
 
 
         // Send message to AI service
-        const result = await sendMessageToAI(
-            message,
-            threadId
-        );
+const result = await sendMessageToAI(
+    message,
+    threadId,
+    req.account._id.toString()
+);
 
 
         // Save AI response

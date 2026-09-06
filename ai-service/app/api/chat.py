@@ -15,6 +15,7 @@ router = APIRouter(
 class ChatRequest(BaseModel):
     message: str
     thread_id: str
+    patient_id: str
 
 
 class ChatResponse(BaseModel):
@@ -32,8 +33,13 @@ def chat(request: ChatRequest):
                 )
             ],
             "llm_calls": 0,
-            "handoff_required": False
+            "handoff_required": False,
+
+            # Patient whose medical documents
+            # should be available to the agent.
+            "patient_id": request.patient_id
         },
+
         config={
             "configurable": {
                 "thread_id": request.thread_id

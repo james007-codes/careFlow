@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   CalendarDays,
   ClipboardList,
@@ -9,9 +10,11 @@ import {
   Stethoscope,
   Menu,
   X,
+  Bot,
 } from "lucide-react";
 
 import { COLORS } from "../../styles/tokens.js";
+import AIAssistant from "../../pages/AIAssistant.jsx";
 
 export function PatientPortal({ user, onLogout }) {
   const [page, setPage] = useState("dashboard");
@@ -32,6 +35,11 @@ export function PatientPortal({ user, onLogout }) {
       id: "records",
       label: "Medical Records",
       icon: FileText,
+    },
+    {
+      id: "ai-assistant",
+      label: "CareFlow AI",
+      icon: Bot,
     },
     {
       id: "profile",
@@ -199,6 +207,7 @@ export function PatientPortal({ user, onLogout }) {
                 {page === "dashboard" && "Patient Dashboard"}
                 {page === "appointments" && "Appointments"}
                 {page === "records" && "Medical Records"}
+                {page === "ai-assistant" && "CareFlow AI"}
                 {page === "profile" && "My Profile"}
               </h2>
 
@@ -206,7 +215,9 @@ export function PatientPortal({ user, onLogout }) {
                 className="text-xs hidden sm:block"
                 style={{ color: COLORS.slate }}
               >
-                Manage your CareFlow information
+                {page === "ai-assistant"
+                  ? "Your private AI-powered medical assistant"
+                  : "Manage your CareFlow information"}
               </p>
             </div>
           </div>
@@ -223,7 +234,13 @@ export function PatientPortal({ user, onLogout }) {
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main
+          className={
+            page === "ai-assistant"
+              ? "p-0"
+              : "p-4 sm:p-6 lg:p-8"
+          }
+        >
           {page === "dashboard" && (
             <DashboardContent
               user={user}
@@ -231,11 +248,21 @@ export function PatientPortal({ user, onLogout }) {
             />
           )}
 
-          {page === "appointments" && <AppointmentsContent />}
+          {page === "appointments" && (
+            <AppointmentsContent />
+          )}
 
-          {page === "records" && <RecordsContent />}
+          {page === "records" && (
+            <RecordsContent />
+          )}
 
-          {page === "profile" && <ProfileContent user={user} />}
+          {page === "ai-assistant" && (
+            <AIAssistant />
+          )}
+
+          {page === "profile" && (
+            <ProfileContent user={user} />
+          )}
         </main>
       </div>
     </div>
@@ -374,7 +401,7 @@ function DashboardContent({ user, onNavigate }) {
           Quick Actions
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <QuickAction
             icon={CalendarDays}
             title="Appointments"
@@ -387,6 +414,13 @@ function DashboardContent({ user, onNavigate }) {
             title="Medical Records"
             description="View your records"
             onClick={() => onNavigate("records")}
+          />
+
+          <QuickAction
+            icon={Bot}
+            title="CareFlow AI"
+            description="Ask questions about your health"
+            onClick={() => onNavigate("ai-assistant")}
           />
 
           <QuickAction
