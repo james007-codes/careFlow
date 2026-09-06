@@ -1,4 +1,6 @@
-const AI_SERVICE_URL = "http://127.0.0.1:8000";
+import env from "../config/env.js";
+
+const AI_SERVICE_URL = env.aiServiceUrl;
 
 export async function sendMessageToAI(
     message,

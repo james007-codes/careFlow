@@ -9,9 +9,11 @@ const env = {
 
     jwtSecret: process.env.JWT_SECRET,
 
-    aiServiceUrl: process.env.AI_SERVICE_URL || "http://localhost:8000",
+    aiServiceUrl:
+        process.env.AI_SERVICE_URL || "http://localhost:8000",
 
-    nodeEnv: process.env.NODE_ENV || "development",
+    nodeEnv:
+        process.env.NODE_ENV || "development",
 };
 
 export default env;
