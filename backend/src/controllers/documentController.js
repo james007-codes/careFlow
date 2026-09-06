@@ -1,7 +1,8 @@
 import fs from "fs";
 import Document from "../models/Document.js";
+import env from "../config/env.js";
 
-const AI_SERVICE_URL = "http://127.0.0.1:8000";
+const AI_SERVICE_URL = env.aiServiceUrl;
 
 export async function uploadDocument(req, res) {
     let document = null;
@@ -21,7 +22,6 @@ export async function uploadDocument(req, res) {
             });
         }
 
-        // 1. Save document metadata in MongoDB
         document = await Document.create({
             user: req.account._id,
             originalName: req.file.originalname,
@@ -32,10 +32,8 @@ export async function uploadDocument(req, res) {
             status: "processing",
         });
 
-        // 2. Read the saved file
         const fileBuffer = fs.readFileSync(req.file.path);
 
-        // 3. Send document to FastAPI
         const formData = new FormData();
 
         const blob = new Blob(
@@ -86,14 +84,12 @@ export async function uploadDocument(req, res) {
             );
         }
 
-        // 4. Mark document as ready
         document.status = "ready";
         await document.save();
 
         return res.status(201).json({
             success: true,
             message: "Document uploaded and processed successfully",
-
             document: {
                 id: document._id,
                 originalName: document.originalName,
@@ -102,19 +98,15 @@ export async function uploadDocument(req, res) {
                 status: document.status,
                 uploadedAt: document.createdAt,
             },
-
             processing: result,
         });
 
     } catch (error) {
-
         console.error(
             "Document upload/processing error:",
             error
         );
 
-        // If MongoDB document was created,
-        // mark processing as failed.
         if (document) {
             try {
                 document.status = "failed";
