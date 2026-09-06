@@ -10,17 +10,21 @@ WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
 
+# Copy application source before uv sync so the project layout is available.
+COPY app ./app
+COPY sample_docs ./sample_docs
+
+# Install the exact CPU-only PyTorch build to avoid CUDA dependencies.
 RUN uv venv /opt/venv && \
     uv pip install \
     --python /opt/venv/bin/python \
     --index-url https://download.pytorch.org/whl/cpu \
     torch==2.14.0
 
+# Install locked dependencies without installing the local project package.
 RUN uv sync --frozen --no-install-project --no-install-package torch
 
-COPY app ./app
-COPY sample_docs ./sample_docs
-
+# Build the general FAISS knowledge base.
 RUN uv run --no-sync python -m app.retrieval.ingest
 
 EXPOSE 8080
